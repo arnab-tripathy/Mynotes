@@ -27,7 +27,19 @@ this.recViewOnclickListener=recViewOnclickListener;
         this.notelist = notelist;
     notifyDataSetChanged();
     }
+public  NoteEntity remove(int position){
 
+            NoteEntity deletednote=notelist.remove(position);
+            notifyItemRemoved(position);
+            return deletednote;
+
+
+    }
+
+    public void addNote(int position,NoteEntity noteEntity){
+        notelist.add(position,noteEntity);
+        notifyItemInserted(position);
+    }
     @NonNull
     @Override
     public MyviewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,24 +74,36 @@ itemTouchHelper.attachToRecyclerView(recyclerView);
         }
 
         @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+        public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+final int position= viewHolder.getAdapterPosition();
 
-            final int position=viewHolder.getAdapterPosition();
             switch (direction){
                     case ItemTouchHelper.LEFT:
-                        LiveData<List<NoteEntity>> notelist=listViewModel.getNotelist();
-                     deletednote  =notelist.getValue().get(position);
-listViewModel.delete(deletednote);
-adapter.notifyItemRemoved(position);
-                        Snackbar.make(recyclerView,"Note deleted",Snackbar.LENGTH_LONG).setAction("Undo", new
+                 //       final LiveData<List<NoteEntity>> notelist=listViewModel.getNotelist();
+                   //  deletednote  =notelist.getValue().get(viewHolder.getAdapterPosition());
+ deletednote=adapter.remove(position);
+
+//adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                        final  Snackbar snackbar=
+                          Snackbar.make(recyclerView,"Note deleted",Snackbar.LENGTH_LONG).setAction("Undo", new
                                 View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                   listViewModel.insert(deletednote);
-                                   adapter.notifyItemInserted(position);
-                                    }
-                                }).show();
+adapter.addNote(position,deletednote);
 
+                                    }
+                                });
+snackbar.addCallback(new Snackbar.Callback(){
+    @Override
+    public void onDismissed(Snackbar transientBottomBar, int event) {
+        super.onDismissed(transientBottomBar, event);
+    if(event==DISMISS_EVENT_TIMEOUT){
+        listViewModel.delete(deletednote);
+    }
+
+    }
+});
+snackbar.show();
                         break;
 
 
